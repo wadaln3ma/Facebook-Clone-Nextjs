@@ -13,8 +13,6 @@ export default function Home() {
     <Header />
   
     <main className="flex">
-    <p className="bg-gray-300">Hello</p>
-    <p className="bg-pink-300">Hello</p>
     </main>
  
     </div>
