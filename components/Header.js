@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 import { FlagIcon, PlayIcon, ShoppingCartIcon, SearchIcon } from '@heroicons/react/outline'
-import { HomeIcon, UserGroupIcon } from '@heroicons/react/solid'
+import { HomeIcon, UserGroupIcon, ViewGridIcon, ChatIcon, BellIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import HeaderIcon from './HeaderIcon'
 
 function Header(){
@@ -26,6 +26,14 @@ function Header(){
         <HeaderIcon Icon={PlayIcon}/>
         <HeaderIcon Icon={ShoppingCartIcon}/>
         <HeaderIcon Icon={UserGroupIcon}/>
+      </div>
+
+      <div className="hidden md:inline-flex sm:space-x-2 justify-end items-center">
+        <p className="pr-3 font-bold whitespace-nowrap">Abdulrahman Hamad</p>
+        <ViewGridIcon className="icon" /> 
+        <ChatIcon className="icon" />
+        <BellIcon className="icon"/>
+        <ChevronDownIcon className="icon" />
       </div>
     </header>
 )}
