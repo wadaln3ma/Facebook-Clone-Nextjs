@@ -38,7 +38,7 @@ function Header(){
                layout="fixed"
                onClick={signOut}/>
 
-        <p className="pr-3 font-bold whitespace-nowrap">Abdulrahman Hamad</p>
+        <p className="pr-3 font-bold whitespace-nowrap">{session.user.name}</p>
         <ViewGridIcon className="icon" />
         <ChatIcon className="icon" />
         <BellIcon className="icon"/>
