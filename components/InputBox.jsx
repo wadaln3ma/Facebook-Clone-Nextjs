@@ -1,15 +1,18 @@
-import { useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from "next/image"
 import { EmojiHappyIcon } from "@heroicons/react/outline"
 import { CameraIcon, VideoCameraIcon } from "@heroicons/react/solid"
-import { db } from '../firebase'
+import { db, storage } from '../firebase'
 import { collection, addDoc } from "firebase/firestore"
 import { updateDoc, serverTimestamp } from "firebase/firestore"
+import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 
 const InputBox = ()=>{
   const { data: session } = useSession()
+  const [imageToPost, setImageToPost] = useState(null)
   const inputRef = useRef(null)
+  const filePickerRef = useRef(null)
 
   const storePost = async (data)=> {
     const posts = collection(db, "posts")
@@ -17,6 +20,21 @@ const InputBox = ()=>{
     await updateDoc(docRef, {
       timestamp: serverTimestamp()
     })
+
+    if(imageToPost){
+      const imageRef = ref(storage, `posts/${docRef.id}`)
+      
+      uploadString(imageRef, imageToPost).then(snapshot =>{
+        getDownloadURL(snapshot.ref).then(url =>{
+          updateDoc(docRef, {
+            postImage : url,
+          })
+        })
+      })
+
+       removeImage()
+
+      }
 
   }
 
@@ -35,6 +53,21 @@ const InputBox = ()=>{
     storePost(data)
 
     inputRef.current.value = ""
+  }
+
+  const addImageToPost = (e)=>{
+    const reader = new FileReader()
+    if(e.target.files[0]){
+      reader.readAsDataURL(e.target.files[0])
+    }
+
+    reader.onload = readerEvent => {
+      setImageToPost(readerEvent.target.result)
+    }
+  }
+
+  const removeImage = ()=>{
+    setImageToPost(null)
   }
 
   return (
@@ -58,6 +91,13 @@ const InputBox = ()=>{
             Submit
           </button>
         </form>
+        {imageToPost &&
+          <div onClick={removeImage}
+               className="flex flex-col filter hover:brightness-110 transition duration-150 transform hover:scale-105 cursor-pointer">
+            <img src={imageToPost} alt="" className="h-10 object-contain" />
+            <p className="text-xs text-red-500 text-center">remove</p>
+            </div> 
+        }
        </div> 
       <div className="flex justify-evenly p-3 border-t">
         <div className="inputIcon">
@@ -66,9 +106,10 @@ const InputBox = ()=>{
         </div>
         <div
           className="inputIcon"
-        >
+          onClick={()=> filePickerRef.current.click()} >
           <CameraIcon className="h-7 text-green-500" />
           <p className="text-xs sm:text-sm xl:text-base">Photo/Video</p>
+          <input type="file" ref={filePickerRef} hidden onChange={addImageToPost} />
         </div>
         <div className="inputIcon">
           <EmojiHappyIcon className="h-7 text-yellow-500" />
