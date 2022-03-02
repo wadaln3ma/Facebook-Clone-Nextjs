@@ -1,6 +1,7 @@
 
 import Stories from "./Stories"
 import InputBox from "./InputBox"
+import Posts from "./Posts"
 
 const Feed = ()=> {
    
@@ -11,6 +12,8 @@ const Feed = ()=> {
         <Stories />
 
         <InputBox /> 
+
+        <Posts />
         
       </div>
     </div>

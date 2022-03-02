@@ -6,11 +6,12 @@ import { CameraIcon, VideoCameraIcon } from "@heroicons/react/solid"
 import { db, storage } from '../firebase'
 import { collection, addDoc } from "firebase/firestore"
 import { updateDoc, serverTimestamp } from "firebase/firestore"
-import { ref, uploadString, getDownloadURL } from 'firebase/storage'
+import { ref, getDownloadURL, uploadString } from 'firebase/storage'
 
 const InputBox = ()=>{
   const { data: session } = useSession()
   const [imageToPost, setImageToPost] = useState(null)
+  const [imgFileName, setImgFileName] = useState('')
   const inputRef = useRef(null)
   const filePickerRef = useRef(null)
 
@@ -22,20 +23,21 @@ const InputBox = ()=>{
     })
 
     if(imageToPost){
-      const imageRef = ref(storage, `posts/${docRef.id}`)
+      const imageRef = ref(storage, `posts/${session.user.email}/${docRef.id}/${imgFileName}`)
+
+      const metadata = {
+        contentType: 'image/jpeg',
+      }
       
-      uploadString(imageRef, imageToPost).then(snapshot =>{
+      uploadString(imageRef, imageToPost, 'data_url', metadata).then(snapshot =>{
+        removeImage()
         getDownloadURL(snapshot.ref).then(url =>{
           updateDoc(docRef, {
             postImage : url,
           })
         })
       })
-
-       removeImage()
-
-      }
-
+    }
   }
 
   const sendPost = (e)=>{
@@ -58,6 +60,7 @@ const InputBox = ()=>{
   const addImageToPost = (e)=>{
     const reader = new FileReader()
     if(e.target.files[0]){
+      setImgFileName(e.target.files[0].name)
       reader.readAsDataURL(e.target.files[0])
     }
 
@@ -84,6 +87,7 @@ const InputBox = ()=>{
           <input
             className="rounded-full h-12 bg-gray-100 flex-grow px-5 focus:outline-none"
             type="text"
+            accept="image/*"
             ref={inputRef}
             placeholder={`What'on on your mind, ${session.user.name}`}
           />
