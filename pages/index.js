@@ -1,4 +1,4 @@
-import {getSession} from 'next-auth/react'
+import {getSession, useSession} from 'next-auth/react'
 import Head from 'next/head'
 import Header from '../components/Header'
 import Login from '../components/Login'
@@ -6,7 +6,9 @@ import Sidebar from '../components/Sidebar'
 import Feed from '../components/Feed'
 import Widgets from '../components/Widgets'
 
-export default function Home({ session }) {
+export default function Home() {
+
+  const { data : session } = useSession()
 
   if(!session) return <Login />
 
@@ -33,6 +35,7 @@ export default function Home({ session }) {
 }
 
 export const getServerSideProps = async (context)=>{
+  //next auth has a problem with server side session??!!
   const session = await getSession(context)
 
   return{
